@@ -85,6 +85,14 @@ export class AuthService {
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {
-    console.log(userId, refreshToken);
+    const user = await this.userService.getUser(userId);
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'Пользователя с таким email не существует!',
+      );
+    }
+
+    console.log(refreshToken);
   }
 }
