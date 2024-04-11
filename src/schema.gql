@@ -1,0 +1,256 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Project {
+  id: String!
+  name: String!
+  lead: User!
+  members: User!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Chat {
+  id: String!
+  members: User!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Message {
+  id: String!
+  text: String!
+  sender: User!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type User {
+  """User id"""
+  id: String!
+  phone_number: String
+  email: String!
+  username: String!
+  projects: Project!
+  chats: Chat!
+  messages: Message!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Permission {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type SignUpResponse {
+  id: String!
+  email: String!
+  username: String!
+}
+
+type SignInResponse {
+  access_token: String!
+  refresh_token: String!
+  user_id: String!
+  type: String!
+}
+
+type File {
+  id: String!
+  short_link: String!
+  name: String!
+  extension: String!
+  size: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Task {
+  id: String!
+  text: String!
+  files: File
+  author_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Notification {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Group {
+  id: String!
+  name: String!
+  label: String!
+  author_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Query {
+  user(id: String!): User!
+  chat(id: Int!): Chat!
+  message(id: Int!): Message!
+  permission(id: Int!): Permission!
+  task(id: Int!): Task!
+  project(id: Int!): Project!
+  notification(id: Int!): Notification!
+  group(id: Int!): Group!
+  file(id: Int!): File!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: String!, input: UpdateUserInput!): User!
+  removeUser(id: String!): User!
+  createChat(createChatInput: CreateChatInput!): Chat!
+  updateChat(updateChatInput: UpdateChatInput!): Chat!
+  removeChat(id: Int!): Chat!
+  createMessage(createMessageInput: CreateMessageInput!): Message!
+  updateMessage(updateMessageInput: UpdateMessageInput!): Message!
+  removeMessage(id: Int!): Message!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
+  removePermission(id: Int!): Permission!
+  SignUp(input: SignUpInput!): SignUpResponse!
+  SignIn(input: SignInInput!): SignInResponse!
+  createTask(createTaskInput: CreateTaskInput!): Task!
+  updateTask(updateTaskInput: UpdateTaskInput!): Task!
+  removeTask(id: Int!): Task!
+  createProject(createProjectInput: CreateProjectInput!): Project!
+  updateProject(updateProjectInput: UpdateProjectInput!): Project!
+  removeProject(id: Int!): Project!
+  createNotification(createNotificationInput: CreateNotificationInput!): Notification!
+  updateNotification(updateNotificationInput: UpdateNotificationInput!): Notification!
+  removeNotification(id: Int!): Notification!
+  createGroup(createGroupInput: CreateGroupInput!): Group!
+  updateGroup(updateGroupInput: UpdateGroupInput!): Group!
+  removeGroup(id: Int!): Group!
+  createFile(createFileInput: UploadFileInput!): File!
+  updateFile(updateFileInput: UpdateFileInput!): File!
+  removeFile(id: Int!): File!
+}
+
+input CreateUserInput {
+  email: String!
+  username: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  email: String!
+  username: String
+  password: String
+  phone_number: String!
+}
+
+input CreateChatInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateChatInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateMessageInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateMessageInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreatePermissionInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdatePermissionInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input SignUpInput {
+  email: String!
+  phone_number: String
+  username: String!
+  first_name: String
+  middle_name: String
+  last_name: String
+  password: String!
+}
+
+input SignInInput {
+  login: String!
+  password: String!
+}
+
+input CreateTaskInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateTaskInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateProjectInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateProjectInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateNotificationInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateNotificationInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateGroupInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateGroupInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UploadFileInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateFileInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
