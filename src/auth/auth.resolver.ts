@@ -4,7 +4,9 @@ import { SignInInput } from './dto/sign-in.input';
 import { SignUpResponse } from './dto/sign-up.response';
 import { SignInResponse } from './dto/sign-in.response';
 import { AuthService } from './auth.service';
+import { Public } from './decorators/public.decorator';
 
+@Public()
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}

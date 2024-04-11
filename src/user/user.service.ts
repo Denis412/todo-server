@@ -33,6 +33,6 @@ export class UserService {
   }
 
   getUser(id: string) {
-    return `This action returns a #${id} user`;
+    return this.repository.findOneBy({ id });
   }
 }

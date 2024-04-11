@@ -13,6 +13,8 @@ import { ProjectModule } from './project/project.module';
 import { NotificationModule } from './notification/notification.module';
 import { GroupModule } from './group/group.module';
 import { FileModule } from './file/file.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AppAuthGuard } from './auth/guards/auth.guard';
 
 @Module({
   imports: [
@@ -45,6 +47,11 @@ import { FileModule } from './file/file.module';
     FileModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AppAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
