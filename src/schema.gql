@@ -44,9 +44,36 @@ type User {
   updated_at: DateTime!
 }
 
+type PropertyAccess {
+  property_name: String!
+  level: Int!
+}
+
+type PermissionConfig {
+  properties_access: [PropertyAccess!]
+  personal_access_level: Int
+}
+
 type Permission {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  id: String!
+  model_id: String!
+  owner_id: String!
+  owner_type: OwnerType!
+  model_type: ModelType!
+  level: Int!
+  config: PermissionConfig
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+enum OwnerType {
+  GROUP
+  USER
+}
+
+enum ModelType {
+  TYPE
+  OBJECT
 }
 
 type SignUpResponse {
@@ -99,7 +126,7 @@ type Query {
   user(id: String!): User!
   chat(id: Int!): Chat!
   message(id: Int!): Message!
-  permission(id: Int!): Permission!
+  permission(id: String!): Permission!
   task(id: Int!): Task!
   project(id: Int!): Project!
   notification(id: Int!): Notification!
@@ -117,9 +144,9 @@ type Mutation {
   createMessage(createMessageInput: CreateMessageInput!): Message!
   updateMessage(updateMessageInput: UpdateMessageInput!): Message!
   removeMessage(id: Int!): Message!
-  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
-  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
-  removePermission(id: Int!): Permission!
+  createPermission(input: CreatePermissionInput!): Permission!
+  updatePermission(id: String!, input: UpdatePermissionInput!): Permission!
+  removePermission(id: String!): Permission!
   SignUp(input: SignUpInput!): SignUpResponse!
   SignIn(input: SignInInput!): SignInResponse!
   createTask(createTaskInput: CreateTaskInput!): Task!
@@ -175,14 +202,31 @@ input UpdateMessageInput {
 }
 
 input CreatePermissionInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  owner_id: String!
+  model_id: String!
+  owner_type: OwnerType!
+  model_type: ModelType!
+  level: Int!
+  config: PermissionConfigInput
+}
+
+input PermissionConfigInput {
+  properties_access: [PropertyAccessInput!]
+  personal_access_level: Int
+}
+
+input PropertyAccessInput {
+  property_name: String!
+  level: Int!
 }
 
 input UpdatePermissionInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  owner_id: String
+  model_id: String
+  owner_type: OwnerType
+  model_type: ModelType
+  level: Int!
+  config: PermissionConfigInput
 }
 
 input SignUpInput {
