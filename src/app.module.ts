@@ -15,6 +15,7 @@ import { GroupModule } from './group/group.module';
 import { FileModule } from './file/file.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AppAuthGuard } from './auth/guards/auth.guard';
+import { PermissionGuard } from './permission/guards/permission.guard';
 
 @Module({
   imports: [
@@ -50,6 +51,10 @@ import { AppAuthGuard } from './auth/guards/auth.guard';
     {
       provide: APP_GUARD,
       useClass: AppAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
     },
   ],
 })

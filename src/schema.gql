@@ -48,6 +48,14 @@ type DeleteResult {
   recordId: String!
 }
 
+type PaginatorInfo {
+  page: Int!
+  count: Int!
+  hasMorePages: Boolean!
+  total: Int!
+  perPage: Int!
+}
+
 type PropertyAccess {
   property_name: String!
   level: Int!
@@ -131,13 +139,37 @@ type Query {
   user(id: String!): User!
   chat(id: Int!): Chat!
   message(id: Int!): Message!
-  Permissions: [Permission!]!
+  PaginatePermission(page: Int!, perPage: Int!, where: PaginatorWhere, orderBy: PaginatorOrderBy): [Permission!]!
   Permission(id: String!): Permission!
   group(id: String!): Group!
   task(id: Int!): Task!
   project(id: Int!): Project!
   notification(id: Int!): Notification!
   file(id: Int!): File!
+}
+
+input PaginatorWhere {
+  column: String
+  operator: PaginatorWhereOperator
+  value: String
+  and: [PaginatorWhere!]
+  or: [PaginatorWhere!]
+}
+
+enum PaginatorWhereOperator {
+  EQ
+  NEQ
+  FTS
+}
+
+input PaginatorOrderBy {
+  column: String!
+  order: PaginatorOrderByOrder!
+}
+
+enum PaginatorOrderByOrder {
+  DESC
+  ASC
 }
 
 type Mutation {

@@ -8,6 +8,9 @@ import { generateId } from '../shared';
 import { GroupService } from '../group/group.service';
 import { UserService } from '../user/user.service';
 import { OwnerType } from './types/owner-type.enum';
+import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
+import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
+import getAllWithPagination from '../shared/utils/getAllWithPagination';
 
 @Injectable()
 export class PermissionService {
@@ -32,11 +35,22 @@ export class PermissionService {
     });
   }
 
-  findAll() {
-    return `This action returns all permission`;
+  findAll(
+    page: number,
+    perPage: number,
+    where?: PaginatorWhere,
+    orderBy?: PaginatorOrderBy,
+  ) {
+    return getAllWithPagination<Permission>(
+      this.repository,
+      page,
+      perPage,
+      where,
+      orderBy,
+    );
   }
 
-  findOne(id: string) {
+  getPermissionById(id: string) {
     return this.repository.findOneBy({ id });
   }
 

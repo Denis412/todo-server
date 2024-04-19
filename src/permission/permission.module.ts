@@ -9,5 +9,6 @@ import { GroupModule } from '../group/group.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Permission]), UserModule, GroupModule],
   providers: [PermissionResolver, PermissionService],
+  exports: [PermissionService],
 })
 export class PermissionModule {}
