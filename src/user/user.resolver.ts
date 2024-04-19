@@ -30,6 +30,6 @@ export class UserResolver {
 
   @Query(() => User, { name: 'user' })
   getUser(@Args('id') id: string) {
-    return this.userService.getUser(id);
+    return this.userService.getUserById(id);
   }
 }

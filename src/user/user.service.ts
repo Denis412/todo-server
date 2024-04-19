@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,7 +32,13 @@ export class UserService {
     return this.repository.findOneBy({ email });
   }
 
-  getUser(id: string) {
-    return this.repository.findOneBy({ id });
+  async getUserById(id: string) {
+    const targetUser = await this.repository.findOneBy({ id });
+
+    if (!targetUser) {
+      throw new NotFoundException(`Not found user with id ${id}`);
+    }
+
+    return targetUser;
   }
 }

@@ -19,8 +19,8 @@ export class GroupResolver {
   }
 
   @Query(() => Group, { name: 'group' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.groupService.findOne(id);
+  findOne(@Args('id') id: string) {
+    return this.groupService.getGroupById(id);
   }
 
   @Mutation(() => Group)

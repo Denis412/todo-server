@@ -85,7 +85,7 @@ export class AuthService {
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {
-    const user = await this.userService.getUser(userId);
+    const user = await this.userService.getUserById(userId);
 
     if (!user) {
       throw new UnauthorizedException(

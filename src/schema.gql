@@ -80,6 +80,15 @@ enum ModelType {
   OBJECT
 }
 
+type Group {
+  id: String!
+  name: String!
+  label: String!
+  author_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
 type SignUpResponse {
   id: String!
   email: String!
@@ -117,25 +126,16 @@ type Notification {
   exampleField: Int!
 }
 
-type Group {
-  id: String!
-  name: String!
-  label: String!
-  author_id: String!
-  created_at: DateTime!
-  updated_at: DateTime!
-}
-
 type Query {
   user(id: String!): User!
   chat(id: Int!): Chat!
   message(id: Int!): Message!
   Permissions: [Permission!]!
   Permission(id: String!): Permission!
+  group(id: String!): Group!
   task(id: Int!): Task!
   project(id: Int!): Project!
   notification(id: Int!): Notification!
-  group(id: Int!): Group!
   file(id: Int!): File!
 }
 
@@ -152,6 +152,9 @@ type Mutation {
   CreatePermission(input: CreatePermissionInput!): Permission!
   UpdatePermission(id: String!, input: UpdatePermissionInput!): Permission!
   DeletePermission(id: String!): DeleteResult!
+  createGroup(createGroupInput: CreateGroupInput!): Group!
+  updateGroup(updateGroupInput: UpdateGroupInput!): Group!
+  removeGroup(id: Int!): Group!
   SignUp(input: SignUpInput!): SignUpResponse!
   SignIn(input: SignInInput!): SignInResponse!
   createTask(createTaskInput: CreateTaskInput!): Task!
@@ -163,9 +166,6 @@ type Mutation {
   createNotification(createNotificationInput: CreateNotificationInput!): Notification!
   updateNotification(updateNotificationInput: UpdateNotificationInput!): Notification!
   removeNotification(id: Int!): Notification!
-  createGroup(createGroupInput: CreateGroupInput!): Group!
-  updateGroup(updateGroupInput: UpdateGroupInput!): Group!
-  removeGroup(id: Int!): Group!
   createFile(createFileInput: UploadFileInput!): File!
   updateFile(updateFileInput: UpdateFileInput!): File!
   removeFile(id: Int!): File!
@@ -234,6 +234,17 @@ input UpdatePermissionInput {
   config: PermissionConfigInput
 }
 
+input CreateGroupInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateGroupInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
 input SignUpInput {
   email: String!
   phone_number: String
@@ -277,17 +288,6 @@ input CreateNotificationInput {
 }
 
 input UpdateNotificationInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
-input CreateGroupInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateGroupInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
