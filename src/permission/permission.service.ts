@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePermissionInput } from './dto/create-permission.input';
 import { UpdatePermissionInput } from './dto/update-permission.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,7 +32,17 @@ export class PermissionService {
     return this.repository.save({ id, ...input });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} permission`;
+  async remove(id: string) {
+    const targetPermission = await this.repository.findOneBy({ id });
+
+    if (!targetPermission) {
+      throw new NotFoundException(`Not found permission with id ${id}`);
+    }
+
+    await this.repository.delete({ id });
+
+    return {
+      recordId: id,
+    };
   }
 }

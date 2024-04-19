@@ -4,28 +4,29 @@ import { Permission } from './entities/permission.entity';
 import { CreatePermissionInput } from './dto/create-permission.input';
 import { UpdatePermissionInput } from './dto/update-permission.input';
 import { Public } from '../auth/decorators/public.decorator';
+import { DeleteResult } from '../shared';
 
 @Public()
 @Resolver(() => Permission)
 export class PermissionResolver {
   constructor(private readonly permissionService: PermissionService) {}
 
-  @Mutation(() => Permission)
+  @Mutation(() => Permission, { name: 'CreatePermission' })
   createPermission(@Args('input') input: CreatePermissionInput) {
     return this.permissionService.create(input);
   }
 
-  @Query(() => [Permission], { name: 'permission' })
+  @Query(() => [Permission], { name: 'Permissions' })
   findAll() {
     return this.permissionService.findAll();
   }
 
-  @Query(() => Permission, { name: 'permission' })
+  @Query(() => Permission, { name: 'Permission' })
   findOne(@Args('id') id: string) {
     return this.permissionService.findOne(id);
   }
 
-  @Mutation(() => Permission)
+  @Mutation(() => Permission, { name: 'UpdatePermission' })
   updatePermission(
     @Args('id') id: string,
     @Args('input') input: UpdatePermissionInput,
@@ -33,8 +34,8 @@ export class PermissionResolver {
     return this.permissionService.update(id, input);
   }
 
-  @Mutation(() => Permission)
-  removePermission(@Args('id') id: string) {
+  @Mutation(() => DeleteResult, { name: 'DeletePermission' })
+  deletePermission(@Args('id') id: string) {
     return this.permissionService.remove(id);
   }
 }
