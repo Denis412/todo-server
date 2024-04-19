@@ -30,6 +30,7 @@ export class Group {
   @Field()
   label: string;
 
+  @Field(() => [User])
   @ManyToMany(() => User)
   @JoinTable()
   users: User[];

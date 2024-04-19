@@ -84,6 +84,7 @@ type Group {
   id: String!
   name: String!
   label: String!
+  users: [User!]!
   author_id: String!
   created_at: DateTime!
   updated_at: DateTime!
