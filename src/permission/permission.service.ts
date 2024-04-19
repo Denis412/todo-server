@@ -14,7 +14,6 @@ export class PermissionService {
   ) {}
 
   async create(input: CreatePermissionInput) {
-    console.log('input', input);
     return this.repository.save({
       id: generateId(),
       ...input,
@@ -30,7 +29,7 @@ export class PermissionService {
   }
 
   update(id: string, input: UpdatePermissionInput) {
-    return `This action updates a #${id} permission`;
+    return this.repository.save({ id, ...input });
   }
 
   remove(id: string) {
