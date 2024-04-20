@@ -39,12 +39,14 @@ export class PermissionService {
   }
 
   findAll(
+    info: any,
     page: number,
     perPage: number,
     where?: PaginatorWhere,
     orderBy?: PaginatorOrderBy,
   ) {
     return getAllWithPagination<Permission>(
+      info,
       'permissions',
       this.repository,
       page,
@@ -52,39 +54,6 @@ export class PermissionService {
       where,
       orderBy,
     );
-  }
-
-  applyJoin(
-    qb: SelectQueryBuilder<Permission>,
-    metadata: EntityMetadata,
-    fieldNodes: any[],
-    alias?: string,
-  ) {
-    if (!Array.isArray(fieldNodes)) return;
-
-    for (const field of fieldNodes) {
-      if (!field.selectionSet) continue;
-
-      const fieldRelation = metadata.relations.find(
-        (relation) => relation.propertyName === field.name.value,
-      );
-
-      if (!fieldRelation) continue;
-
-      const relationTableName = fieldRelation.inverseEntityMetadata.tableName;
-
-      const propertyName = `${alias ? alias + '.' : ''}${relationTableName}`;
-      const aliasName = `${alias ? alias + '_' : ''}${relationTableName}`;
-
-      qb.innerJoinAndSelect(propertyName, aliasName);
-
-      this.applyJoin(
-        qb,
-        fieldRelation.inverseEntityMetadata,
-        field.selectionSet.selections,
-        aliasName,
-      );
-    }
   }
 
   addRelationWithInfo(
@@ -163,6 +132,9 @@ export class PermissionService {
     const fieldNodes =
       info.fieldNodes[0].selectionSet.selections[0].selectionSet.selections;
     this.addRelationWithInfo(fieldNodes, qb, permissionMetadata, 'permissions');
+
+    if (where) {
+    }
 
     const [data, totalElements] = await qb
       .offset(0)

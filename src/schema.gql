@@ -92,6 +92,11 @@ type PaginatorInfo {
   perPage: Int!
 }
 
+type UserPaginate {
+  data: [User!]!
+  paginatorInfo: PaginatorInfo!
+}
+
 type Group {
   id: String!
   name: String!
@@ -145,6 +150,7 @@ type Notification {
 }
 
 type Query {
+  PaginateUser(page: Int!, perPage: Int!, where: PaginatorWhere, orderBy: PaginatorOrderBy): UserPaginate!
   user(id: String!): User!
   chat(id: Int!): Chat!
   message(id: Int!): Message!

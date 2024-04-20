@@ -5,6 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { generateId } from '../shared';
+import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
+import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
+import getAllWithPagination from '../shared/utils/getAllWithPagination';
 
 @Injectable()
 export class UserService {
@@ -25,8 +28,22 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
-  paginateUser() {
-    return `This action returns all user`;
+  findAll(
+    info: any,
+    page: number,
+    perPage: number,
+    where?: PaginatorWhere,
+    orderBy?: PaginatorOrderBy,
+  ) {
+    return getAllWithPagination<User>(
+      info,
+      'permissions',
+      this.repository,
+      page,
+      perPage,
+      where,
+      orderBy,
+    );
   }
 
   getUserByEmail(email: string) {

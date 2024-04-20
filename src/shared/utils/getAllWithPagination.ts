@@ -13,25 +13,36 @@ import {
   SelectQueryBuilder,
   WhereExpressionBuilder,
 } from 'typeorm';
+import { PaginatorInfo } from '../types/dto/pagination-result.type';
 
-async function autoInnerJoinAndSelect<T>(
+function addRelationWithInfo<T>(
+  fieldNodes: any[],
   qb: SelectQueryBuilder<T>,
   metadata: EntityMetadata,
   alias: string,
-  currentDepth: number = 1,
 ) {
-  if (currentDepth > 4) {
-    return;
-  }
+  for (const field of fieldNodes) {
+    if (!field.selectionSet) continue;
 
-  metadata.relations.forEach((relation) => {
+    const relation = metadata.relations.find(
+      (rel) => rel.propertyName === field.name.value,
+    );
+
+    if (!relation) continue;
+
+    const propertyName = `${alias}.${relation.propertyName}`;
     const relationAlias = `${alias}-${relation.propertyName}`;
 
-    qb.innerJoinAndSelect(`${alias}.${relation.propertyName}`, relationAlias);
+    console.log(propertyName, relationAlias);
 
-    const joinedMetadata = qb.connection.getMetadata(relation.type);
-    autoInnerJoinAndSelect(qb, joinedMetadata, relationAlias, currentDepth + 1);
-  });
+    qb.leftJoinAndSelect(propertyName, relationAlias);
+    addRelationWithInfo(
+      field.selectionSet.selections,
+      qb,
+      relation.inverseEntityMetadata,
+      relationAlias,
+    );
+  }
 }
 
 function applyWhereFilter<T>(
@@ -60,12 +71,14 @@ function applyWhereFilter<T>(
       }),
     );
   } else {
-    const parts = where.column.split('->');
+    // const parts = where.column.split('->');
+    //
+    // const fieldPath = parts.reduce((path, part, index) => {
+    //   if (index === 0) return `${part}`;
+    //   return `${path}.${part}`;
+    // }, '');
 
-    const fieldPath = parts.reduce((path, part, index) => {
-      if (index === 0) return `${part}`;
-      return `${path}.${part}`;
-    }, '');
+    const fieldPath = where.column;
 
     if (where?.operator === PaginatorWhereOperator.FTS) {
       qb[call](`${fieldPath} LIKE '%${where.value}%'`);
@@ -78,6 +91,7 @@ function applyWhereFilter<T>(
 }
 
 export default async function getAllWithPagination<T = any>(
+  info: any,
   entityName: string,
   repository: Repository<T>,
   page: number,
@@ -85,15 +99,17 @@ export default async function getAllWithPagination<T = any>(
   where?: PaginatorWhere,
   orderBy?: PaginatorOrderBy,
 ) {
-  const query = repository.createQueryBuilder('permissions');
+  const query = repository.createQueryBuilder(entityName);
 
-  await autoInnerJoinAndSelect(query, repository.metadata, entityName);
+  const fieldNodes =
+    info.fieldNodes[0].selectionSet.selections[0].selectionSet.selections;
+  addRelationWithInfo<T>(fieldNodes, query, repository.metadata, entityName);
 
-  if (where) {
-    applyWhereFilter(query, where, 'orWhere');
-  }
+  // if (where) {
+  //   applyWhereFilter(query, where, 'orWhere');
+  // }
 
-  // console.log('query', query.getQuery());
+  console.log('query', query.getQuery());
 
   if (orderBy) {
     switch (orderBy.order) {
@@ -108,9 +124,22 @@ export default async function getAllWithPagination<T = any>(
 
   const offset = (page - 1) * perPage;
 
-  const [data] = await query.offset(offset).limit(perPage).getManyAndCount();
+  const [data, totalElements] = await query
+    .offset(offset)
+    .limit(perPage)
+    .getManyAndCount();
 
-  return data;
+  const totalPages = Math.ceil(totalElements / perPage);
+
+  const paginationMeta: PaginatorInfo = {
+    page,
+    perPage,
+    count: totalElements,
+    hasMorePages: totalPages > page,
+    totalPages: totalPages,
+  };
+
+  return { data, paginatorInfo: paginationMeta };
 }
 
 // const totalPages = Math.ceil(total / perPage);

@@ -31,7 +31,7 @@ export class PermissionResolver {
     @Args('orderBy', { type: () => PaginatorOrderBy, nullable: true })
     orderBy?: PaginatorOrderBy,
   ) {
-    return this.permissionService.findAll1(info, page, perPage, where, orderBy);
+    return this.permissionService.findAll(info, page, perPage, where, orderBy);
   }
 
   @Query(() => Permission, { name: 'Permission' })

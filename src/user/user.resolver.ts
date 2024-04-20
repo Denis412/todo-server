@@ -1,9 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Info } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Public } from '../auth/decorators/public.decorator';
+import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
+import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
+import { UserPaginate } from './entities/user-paginate.type';
 
 @Public()
 @Resolver(() => User)
@@ -25,9 +28,17 @@ export class UserResolver {
     return this.userService.remove(id);
   }
 
-  @Query(() => [User], { name: 'user' })
-  paginateUser() {
-    return this.userService.paginateUser();
+  @Query(() => UserPaginate, { name: 'PaginateUser' })
+  paginateUser(
+    @Info() info,
+    @Args('page', { type: () => Int }) page: number,
+    @Args('perPage', { type: () => Int }) perPage: number,
+    @Args('where', { type: () => PaginatorWhere, nullable: true })
+    where?: PaginatorWhere,
+    @Args('orderBy', { type: () => PaginatorOrderBy, nullable: true })
+    orderBy?: PaginatorOrderBy,
+  ) {
+    return this.userService.findAll(info, page, perPage, where, orderBy);
   }
 
   @Query(() => User, { name: 'user' })
