@@ -46,6 +46,7 @@ function addRelationWithInfo<T>(
 }
 
 function applyWhereFilter<T>(
+  entityName: string,
   qb: SelectQueryBuilder<T> | WhereExpressionBuilder,
   where: PaginatorWhere,
   call?: string,
@@ -58,7 +59,7 @@ function applyWhereFilter<T>(
     qb.andWhere(
       new Brackets((subQb) => {
         for (const part of where.and!) {
-          applyWhereFilter(subQb, part, 'andWhere');
+          applyWhereFilter(entityName, subQb, part, 'andWhere');
         }
       }),
     );
@@ -66,19 +67,21 @@ function applyWhereFilter<T>(
     qb.orWhere(
       new Brackets((subQb) => {
         for (const part of where.or!) {
-          applyWhereFilter(subQb, part, 'orWhere');
+          applyWhereFilter(entityName, subQb, part, 'orWhere');
         }
       }),
     );
   } else {
-    // const parts = where.column.split('->');
-    //
-    // const fieldPath = parts.reduce((path, part, index) => {
-    //   if (index === 0) return `${part}`;
-    //   return `${path}.${part}`;
-    // }, '');
+    const column = where.column;
+    let fieldPath = '';
 
-    const fieldPath = where.column;
+    if (column.includes('->')) {
+      fieldPath = `${entityName}-${column.replaceAll('->', '.')}`;
+    } else {
+      fieldPath = `${entityName}.${column}`;
+    }
+
+    // const fieldPath = `${entityName}.${column}`;
 
     if (where?.operator === PaginatorWhereOperator.FTS) {
       qb[call](`${fieldPath} LIKE '%${where.value}%'`);
@@ -105,11 +108,9 @@ export default async function getAllWithPagination<T = any>(
     info.fieldNodes[0].selectionSet.selections[0].selectionSet.selections;
   addRelationWithInfo<T>(fieldNodes, query, repository.metadata, entityName);
 
-  // if (where) {
-  //   applyWhereFilter(query, where, 'orWhere');
-  // }
-
-  console.log('query', query.getQuery());
+  if (where) {
+    applyWhereFilter(entityName, query, where, 'orWhere');
+  }
 
   if (orderBy) {
     switch (orderBy.order) {
