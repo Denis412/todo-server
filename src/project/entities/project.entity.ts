@@ -3,6 +3,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryColumn,
@@ -26,10 +28,16 @@ export class Project {
 
   @ManyToOne(() => User, (user) => user.projects)
   @Field(() => User)
+  @JoinColumn({
+    name: 'usersId',
+  })
   lead: User;
 
+  @Field(() => [User])
   @ManyToMany(() => User)
-  @Field(() => User)
+  @JoinTable({
+    name: 'users_projects',
+  })
   members: User[];
 
   @CreateDateColumn()

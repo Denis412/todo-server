@@ -8,6 +8,7 @@ import { generateId } from '../shared';
 
 @Injectable()
 export class UserService {
+  relations = ['permissions'];
   constructor(
     @InjectRepository(User) private readonly repository: Repository<User>,
   ) {}
@@ -29,11 +30,17 @@ export class UserService {
   }
 
   getUserByEmail(email: string) {
-    return this.repository.findOneBy({ email });
+    return this.repository.findOne({
+      where: { email },
+      relations: this.relations,
+    });
   }
 
   async getUserById(id: string) {
-    const targetUser = await this.repository.findOneBy({ id });
+    const targetUser = await this.repository.findOne({
+      where: { id },
+      relations: this.relations,
+    });
 
     if (!targetUser) {
       throw new NotFoundException(`Not found user with id ${id}`);

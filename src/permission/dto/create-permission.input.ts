@@ -3,6 +3,7 @@ import { PermissionConfigInput } from './permission-config.input';
 import { OwnerType } from '../types/owner-type.enum';
 import { ModelType } from '../types/model-type.enum';
 import { IsString, Matches } from 'class-validator';
+import { RelationInput } from '../../shared';
 
 @InputType()
 export class CreatePermissionInput {
@@ -21,6 +22,9 @@ export class CreatePermissionInput {
 
   @Field(() => ModelType)
   model_type: ModelType;
+
+  @Field(() => RelationInput)
+  user: RelationInput;
 
   @Field(() => Int)
   level: number;

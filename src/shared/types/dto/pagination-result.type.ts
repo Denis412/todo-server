@@ -12,8 +12,7 @@ export class PaginatorInfo {
   hasMorePages: boolean;
 
   @Field(() => Int)
-  total: number;
-
+  totalPages: number;
   // @Field(() => Int)
   // current: number;
   //

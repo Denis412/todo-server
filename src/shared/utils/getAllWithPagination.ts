@@ -8,10 +8,31 @@ import {
 } from '../types/dto/paginator-order-by.type';
 import {
   Brackets,
+  EntityMetadata,
   Repository,
   SelectQueryBuilder,
   WhereExpressionBuilder,
 } from 'typeorm';
+
+async function autoInnerJoinAndSelect<T>(
+  qb: SelectQueryBuilder<T>,
+  metadata: EntityMetadata,
+  alias: string,
+  currentDepth: number = 1,
+) {
+  if (currentDepth > 4) {
+    return;
+  }
+
+  metadata.relations.forEach((relation) => {
+    const relationAlias = `${alias}-${relation.propertyName}`;
+
+    qb.innerJoinAndSelect(`${alias}.${relation.propertyName}`, relationAlias);
+
+    const joinedMetadata = qb.connection.getMetadata(relation.type);
+    autoInnerJoinAndSelect(qb, joinedMetadata, relationAlias, currentDepth + 1);
+  });
+}
 
 function applyWhereFilter<T>(
   qb: SelectQueryBuilder<T> | WhereExpressionBuilder,
@@ -57,17 +78,22 @@ function applyWhereFilter<T>(
 }
 
 export default async function getAllWithPagination<T = any>(
+  entityName: string,
   repository: Repository<T>,
   page: number,
   perPage: number,
   where?: PaginatorWhere,
   orderBy?: PaginatorOrderBy,
 ) {
-  const query = repository.createQueryBuilder();
+  const query = repository.createQueryBuilder('permissions');
+
+  await autoInnerJoinAndSelect(query, repository.metadata, entityName);
 
   if (where) {
     applyWhereFilter(query, where, 'orWhere');
   }
+
+  // console.log('query', query.getQuery());
 
   if (orderBy) {
     switch (orderBy.order) {

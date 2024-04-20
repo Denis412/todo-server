@@ -1,8 +1,10 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import {
+  AfterLoad,
   Column,
   CreateDateColumn,
   Entity,
+  getRepository,
   JoinTable,
   ManyToMany,
   OneToMany,
@@ -13,6 +15,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { Project } from '../../project/entities/project.entity';
 import { Chat } from '../../chat/entities/chat.entity';
 import { Message } from '../../message/entities/message.entity';
+import { Permission } from '../../permission/entities/permission.entity';
 
 export class Fullname {
   @Column({ nullable: true })
@@ -28,21 +31,21 @@ export class Fullname {
 @Entity({ name: 'users' })
 @ObjectType()
 export class User {
-  @PrimaryColumn()
   @Field({ description: 'User id' })
+  @PrimaryColumn()
   id: string;
 
-  @Column({ unique: true, nullable: true })
   @Field({ nullable: true })
+  @Column({ unique: true, nullable: true })
   phone_number: string;
 
-  @Column({ unique: true })
   @Field()
+  @Column({ unique: true })
   email: string;
 
   @IsNotEmpty()
-  @Column({ unique: true })
   @Field()
+  @Column({ unique: true })
   username: string;
 
   @Column(() => Fullname)
@@ -52,25 +55,33 @@ export class User {
   @Column({ nullable: false })
   password: string;
 
+  @Field(() => [Project])
   @OneToMany(() => Project, (project) => project.members)
-  @JoinTable()
-  @Field(() => Project)
+  @JoinTable({
+    name: 'users_projects',
+  })
   projects: Project[];
 
-  @ManyToMany(() => Chat)
-  @JoinTable()
-  @Field(() => Chat)
+  @Field(() => [Chat])
+  @ManyToMany(() => Chat, { eager: true })
+  @JoinTable({
+    name: 'users_chats',
+  })
   chats: Chat[];
 
-  @OneToMany(() => Message, (message) => message.sender)
-  @Field(() => Message)
+  @Field(() => [Message])
+  @OneToMany(() => Message, (message) => message.sender, { eager: true })
   messages: Message[];
 
-  @CreateDateColumn()
+  @Field(() => [Permission])
+  @OneToMany(() => Permission, (permission) => permission.user)
+  permissions: Permission[];
+
   @Field(() => Date)
+  @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
   @Field(() => Date)
+  @UpdateDateColumn()
   updated_at: Date;
 }

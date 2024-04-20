@@ -3,7 +3,9 @@ import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { Public } from '../auth/decorators/public.decorator';
 
+@Public()
 @Resolver(() => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}

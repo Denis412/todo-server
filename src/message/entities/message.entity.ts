@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { Chat } from '../../chat/entities/chat.entity';
 
 @Entity({ name: 'messages' })
 @ObjectType()
@@ -23,6 +24,10 @@ export class Message {
   @ManyToOne(() => User, (user) => user.messages)
   @Field(() => User)
   sender: User;
+
+  @Field(() => Chat)
+  @ManyToOne(() => Chat, (chat) => chat.messages)
+  chat: Chat;
 
   @CreateDateColumn()
   @Field(() => Date)
