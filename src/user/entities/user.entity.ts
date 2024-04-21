@@ -1,21 +1,20 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import {
-  AfterLoad,
   Column,
   CreateDateColumn,
   Entity,
-  getRepository,
   JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { Project } from '../../project/entities/project.entity';
 import { Chat } from '../../chat/entities/chat.entity';
 import { Message } from '../../message/entities/message.entity';
 import { Permission } from '../../permission/entities/permission.entity';
+import { Group } from '../../group/entities/group.entity';
 
 export class Fullname {
   @Column({ nullable: true })
@@ -76,6 +75,13 @@ export class User {
   @Field(() => [Permission])
   @OneToMany(() => Permission, (permission) => permission.user)
   permissions: Permission[];
+
+  @Field(() => [Group])
+  @ManyToMany(() => Group, { eager: true, nullable: true })
+  @JoinTable({
+    name: 'users_groups',
+  })
+  groups: Group[];
 
   @Field(() => Date)
   @CreateDateColumn()

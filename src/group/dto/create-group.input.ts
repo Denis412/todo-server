@@ -1,7 +1,19 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
+import { RelationInput } from '../../shared';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 @InputType()
 export class CreateGroupInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @IsNotEmpty()
+  @IsString()
+  @Field()
+  name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Field()
+  label: string;
+
+  @Field(() => [RelationInput], { nullable: true })
+  users: RelationInput[];
 }

@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int, Info } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  Info,
+  Context,
+} from '@nestjs/graphql';
 import { PermissionService } from './permission.service';
 import { Permission } from './entities/permission.entity';
 import { CreatePermissionInput } from './dto/create-permission.input';
@@ -9,14 +17,16 @@ import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
 import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
 import { PermissionPaginate } from './entities/permission-paginate.type';
 
-@Public()
 @Resolver(() => Permission)
 export class PermissionResolver {
   constructor(private readonly permissionService: PermissionService) {}
 
   @Mutation(() => Permission, { name: 'CreatePermission' })
-  createPermission(@Args('input') input: CreatePermissionInput) {
-    return this.permissionService.create(input);
+  createPermission(
+    @Context() context,
+    @Args('input') input: CreatePermissionInput,
+  ) {
+    return this.permissionService.create(input, context.req['user']);
   }
 
   @Query(() => PermissionPaginate, {
@@ -34,7 +44,7 @@ export class PermissionResolver {
     return this.permissionService.findAll(info, page, perPage, where, orderBy);
   }
 
-  @Query(() => Permission, { name: 'Permission' })
+  @Query(() => Permission, { name: 'GetPermission' })
   findOne(@Args('id') id: string) {
     return this.permissionService.getPermissionById(id);
   }

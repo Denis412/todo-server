@@ -35,15 +35,15 @@ function addRelationWithInfo<T>(
     const propertyName = `${alias}.${relation.propertyName}`;
     const relationAlias = `${alias}-${relation.propertyName}`;
 
-    console.log('name', propertyName, relationAlias);
+    // console.log('name', propertyName, relationAlias);
 
     if (
       !qb.expressionMap.joinAttributes.some(
         (join) => join.alias.name === relationAlias,
       )
     ) {
-      relationsForQuery.set(propertyName, relationAlias);
-      // qb.leftJoinAndSelect(propertyName, relationAlias);
+      // relationsForQuery.set(propertyName, relationAlias);
+      qb.leftJoinAndSelect(propertyName, relationAlias);
     }
 
     addRelationWithInfo(
@@ -83,7 +83,7 @@ function applyWhereFilter<T>(
       }),
     );
   } else if (where?.or) {
-    qb.orWhere(
+    qb.andWhere(
       new Brackets((subQb) => {
         for (const part of where.or!) {
           applyWhereFilter(entityName, query, subQb, part, metadata, 'orWhere');
@@ -115,7 +115,7 @@ function applyWhereFilter<T>(
           .replace(lastRelation ? `${lastRelation}-` : '', '')
           .split('-');
 
-        console.log('last', lastRelation, relationPath, addedRelations);
+        // console.log('last', lastRelation, relationPath, addedRelations);
         let currentRelationAdd = lastRelation;
 
         for (const addedRelation of addedRelations) {
@@ -124,14 +124,14 @@ function applyWhereFilter<T>(
             : addedRelation;
 
           if (currentRelationAdd.includes('.')) {
-            relationsForQuery.set(
-              currentRelationAdd,
-              currentRelationAdd.replaceAll('.', '-'),
-            );
-            // query.leftJoinAndSelect(
+            // relationsForQuery.set(
             //   currentRelationAdd,
             //   currentRelationAdd.replaceAll('.', '-'),
             // );
+            query.leftJoinAndSelect(
+              currentRelationAdd,
+              currentRelationAdd.replaceAll('.', '-'),
+            );
           }
 
           currentRelationAdd = currentRelationAdd.replaceAll('.', '-');
@@ -142,7 +142,7 @@ function applyWhereFilter<T>(
 
     fieldPath += `.${fields[fields.length - 1]}`;
 
-    console.log('field', fieldPath);
+    // console.log('field', fieldPath);
 
     if (where?.operator === PaginatorWhereOperator.FTS) {
       qb[call](`${fieldPath} LIKE '%${where.value}%'`);
@@ -165,9 +165,11 @@ export default async function getAllWithPagination<T = any>(
 ) {
   const query = repository.createQueryBuilder(entityName);
 
-  const fieldNodes =
-    info.fieldNodes[0].selectionSet.selections[0].selectionSet.selections;
-  addRelationWithInfo<T>(fieldNodes, query, repository.metadata, entityName);
+  if (info) {
+    const fieldNodes =
+      info.fieldNodes[0].selectionSet.selections[0].selectionSet.selections;
+    addRelationWithInfo<T>(fieldNodes, query, repository.metadata, entityName);
+  }
 
   applyWhereFilter(
     entityName,
@@ -193,11 +195,13 @@ export default async function getAllWithPagination<T = any>(
 
   query.skip(offset).take(perPage);
 
-  relationsForQuery.forEach((value, key) => {
-    query.leftJoinAndSelect(key, value);
-  });
+  console.log('f', query.getQuery());
 
-  console.log('query', query.getQuery());
+  // relationsForQuery.forEach((value, key) => {
+  //   query.leftJoinAndSelect(key, value);
+  // });
+
+  // console.log('query', query.getQuery());
 
   const [data, totalElements] = await query.getManyAndCount();
 

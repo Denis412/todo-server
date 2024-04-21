@@ -5,45 +5,47 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsNotEmpty, IsString } from 'class-validator';
 import { User } from '../../user/entities/user.entity';
+import { Permission } from '../../permission/entities/permission.entity';
 
 @Entity({ name: 'groups' })
 @ObjectType()
 export class Group {
-  @PrimaryColumn()
   @Field()
+  @PrimaryColumn()
   id: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @Column()
   @Field()
+  @Column()
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @Column()
   @Field()
+  @Column()
   label: string;
 
   @Field(() => [User])
   @ManyToMany(() => User)
-  @JoinTable()
+  @JoinTable({
+    name: 'users_groups',
+  })
   users: User[];
 
-  @Column({ nullable: true })
+  @ManyToOne(() => Permission, (permission) => permission.group)
+  permissions: Permission[];
+
   @Field()
+  @Column({ nullable: true })
   author_id: string;
 
-  @CreateDateColumn()
   @Field(() => Date)
+  @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
   @Field(() => Date)
+  @UpdateDateColumn()
   updated_at: Date;
 }

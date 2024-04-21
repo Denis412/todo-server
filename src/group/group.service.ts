@@ -4,6 +4,10 @@ import { UpdateGroupInput } from './dto/update-group.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
 import { Repository } from 'typeorm';
+import { generateId } from '../shared';
+import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
+import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
+import getAllWithPagination from '../shared/utils/getAllWithPagination';
 
 @Injectable()
 export class GroupService {
@@ -11,12 +15,30 @@ export class GroupService {
     @InjectRepository(Group) private readonly repository: Repository<Group>,
   ) {}
 
-  create(input: CreateGroupInput) {
-    return 'This action adds a new group';
+  create(input: CreateGroupInput, userInfo: any) {
+    return this.repository.save({
+      id: generateId(),
+      ...input,
+      author_id: userInfo.sub,
+    });
   }
 
-  findAll() {
-    return `This action returns all group`;
+  findAll(
+    info: any,
+    page: number,
+    perPage: number,
+    where?: PaginatorWhere,
+    orderBy?: PaginatorOrderBy,
+  ) {
+    return getAllWithPagination<Group>(
+      info,
+      'groups',
+      this.repository,
+      page,
+      perPage,
+      where,
+      orderBy,
+    );
   }
 
   async getGroupById(id: string) {
@@ -29,11 +51,11 @@ export class GroupService {
     return targetGroup;
   }
 
-  update(id: number, input: UpdateGroupInput) {
-    return `This action updates a #${id} group`;
+  update(id: string, input: UpdateGroupInput) {
+    return this.repository.save({ id, ...input });
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} group`;
   }
 }

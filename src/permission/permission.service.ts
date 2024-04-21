@@ -23,7 +23,7 @@ export class PermissionService {
     private readonly userService: UserService,
   ) {}
 
-  async create(input: CreatePermissionInput) {
+  async create(input: CreatePermissionInput, userInfo: any) {
     const targetOwner =
       input.owner_type === OwnerType.GROUP
         ? await this.groupService.getGroupById(input.owner_id)
@@ -34,7 +34,7 @@ export class PermissionService {
     return this.repository.save({
       id: generateId(),
       ...input,
-      user: targetOwner as User,
+      author_id: userInfo.sub,
     });
   }
 
@@ -56,102 +56,16 @@ export class PermissionService {
     );
   }
 
-  addRelationWithInfo(
-    fieldNodes: any[],
-    qb: SelectQueryBuilder<Permission>,
-    metadata: EntityMetadata,
-    alias: string,
-  ) {
-    for (const field of fieldNodes) {
-      if (!field.selectionSet) continue;
-
-      const relation = metadata.relations.find(
-        (rel) => rel.propertyName === field.name.value,
-      );
-
-      if (!relation) continue;
-
-      const propertyName = `${alias}.${relation.propertyName}`;
-      const relationAlias = `${alias}-${relation.propertyName}`;
-
-      console.log(propertyName, relationAlias);
-
-      qb.leftJoinAndSelect(propertyName, relationAlias);
-      this.addRelationWithInfo(
-        field.selectionSet.selections,
-        qb,
-        relation.inverseEntityMetadata,
-        relationAlias,
-      );
-    }
-  }
-
-  addRelation(
-    qb: SelectQueryBuilder<Permission>,
-    metadata: EntityMetadata,
-    propName: string,
-    alias: string,
-  ) {}
-  addRelations(
-    qb: SelectQueryBuilder<Permission>,
-    metadata: EntityMetadata,
-    alias: string,
-    currentDepth: number = 1,
-  ) {
-    if (currentDepth > 4) return;
-
-    metadata.relations.forEach((relation) => {
-      const propertyName = `${alias}.${relation.propertyName}`;
-      const relationAlias = `${alias}-${relation.propertyName}`;
-
-      console.log(propertyName, relationAlias);
-
-      qb.leftJoinAndSelect(propertyName, relationAlias);
-
-      this.addRelations(
-        qb,
-        relation.inverseEntityMetadata,
-        relationAlias,
-        currentDepth + 1,
-      );
-    });
-  }
-
-  async findAll1(
-    info: any,
-    page: number,
-    perPage: number,
-    where?: PaginatorWhere,
-    orderBy?: PaginatorOrderBy,
-  ) {
-    const qb = this.repository.createQueryBuilder('permissions');
-
-    const permissionMetadata = this.repository.metadata;
-
-    // this.addRelations(qb, permissionMetadata, 'permissions');
-    const fieldNodes =
-      info.fieldNodes[0].selectionSet.selections[0].selectionSet.selections;
-    this.addRelationWithInfo(fieldNodes, qb, permissionMetadata, 'permissions');
-
-    if (where) {
-    }
-
-    const [data, totalElements] = await qb
-      .offset(0)
-      .limit(50)
-      .getManyAndCount();
-
-    const totalPages = Math.ceil(totalElements / perPage);
-
-    const paginationMeta: PaginatorInfo = {
-      page,
-      perPage,
-      count: totalElements,
-      hasMorePages: totalPages > page,
-      totalPages: totalPages,
-    };
-
-    return { data, paginatorInfo: paginationMeta };
+  checkPermissionInPermissionGuard(where: PaginatorWhere) {
+    return getAllWithPagination<Permission>(
+      null,
+      'permissions',
+      this.repository,
+      1,
+      1000,
+      where,
+      null,
+    );
   }
 
   getPermissionById(id: string) {

@@ -23,7 +23,10 @@ export class CreatePermissionInput {
   @Field(() => ModelType)
   model_type: ModelType;
 
-  @Field(() => RelationInput)
+  @Field({ nullable: true })
+  model_name: string;
+
+  @Field(() => RelationInput, { nullable: true })
   user: RelationInput;
 
   @Field(() => Int)

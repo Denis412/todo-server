@@ -12,6 +12,7 @@ import { PermissionConfig } from '../types/permission-config.type';
 import { OwnerType } from '../types/owner-type.enum';
 import { ModelType } from '../types/model-type.enum';
 import { User } from '../../user/entities/user.entity';
+import { Group } from '../../group/entities/group.entity';
 
 @Entity({ name: 'permissions' })
 @ObjectType()
@@ -36,6 +37,10 @@ export class Permission {
   @Column({ type: 'enum', enum: ModelType })
   model_type: ModelType;
 
+  @Field()
+  @Column({ nullable: true })
+  model_name: string;
+
   @Field(() => Int)
   @Column({ type: 'int' })
   level: number;
@@ -45,9 +50,18 @@ export class Permission {
   config: PermissionConfig;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.permissions)
+  @ManyToOne(() => User, (user) => user.permissions, { nullable: true })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @Field(() => Group)
+  @ManyToOne(() => Group, (group) => group.permissions)
+  @JoinColumn({ name: 'group_id' })
+  group: Group;
+
+  @Field()
+  @Column()
+  author_id: string;
 
   @Field(() => Date)
   @CreateDateColumn()

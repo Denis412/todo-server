@@ -8,7 +8,7 @@ import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
 import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
 import { UserPaginate } from './entities/user-paginate.type';
 
-@Public()
+// @Public()
 @Resolver(() => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
@@ -18,12 +18,12 @@ export class UserResolver {
     return this.userService.create(input);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => User, { name: 'UpdateUser' })
   updateUser(@Args('id') id: string, @Args('input') input: UpdateUserInput) {
     return this.userService.update(id, input);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => User, { name: 'DeleteUser' })
   removeUser(@Args('id') id: string) {
     return this.userService.remove(id);
   }
@@ -41,7 +41,7 @@ export class UserResolver {
     return this.userService.findAll(info, page, perPage, where, orderBy);
   }
 
-  @Query(() => User, { name: 'user' })
+  @Query(() => User, { name: 'GetUser' })
   getUser(@Args('id') id: string) {
     return this.userService.getUserById(id);
   }

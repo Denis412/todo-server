@@ -43,15 +43,28 @@ type PermissionConfig {
   personal_access_level: Int
 }
 
+type Group {
+  id: String!
+  name: String!
+  label: String!
+  users: [User!]!
+  author_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
 type Permission {
   id: String!
   model_id: String!
   owner_id: String!
   owner_type: OwnerType!
   model_type: ModelType!
+  model_name: String!
   level: Int!
   config: PermissionConfig
   user: User!
+  group: Group!
+  author_id: String!
   created_at: DateTime!
   updated_at: DateTime!
 }
@@ -76,6 +89,7 @@ type User {
   chats: [Chat!]!
   messages: [Message!]!
   permissions: [Permission!]!
+  groups: [Group!]!
   created_at: DateTime!
   updated_at: DateTime!
 }
@@ -95,16 +109,6 @@ type PaginatorInfo {
 type UserPaginate {
   data: [User!]!
   paginatorInfo: PaginatorInfo!
-}
-
-type Group {
-  id: String!
-  name: String!
-  label: String!
-  users: [User!]!
-  author_id: String!
-  created_at: DateTime!
-  updated_at: DateTime!
 }
 
 type PermissionPaginate {
@@ -151,12 +155,13 @@ type Notification {
 
 type Query {
   PaginateUser(page: Int!, perPage: Int!, where: PaginatorWhere, orderBy: PaginatorOrderBy): UserPaginate!
-  user(id: String!): User!
+  GetUser(id: String!): User!
   chat(id: Int!): Chat!
   message(id: Int!): Message!
   PaginatePermission(page: Int!, perPage: Int!, where: PaginatorWhere, orderBy: PaginatorOrderBy): PermissionPaginate!
-  Permission(id: String!): Permission!
-  group(id: String!): Group!
+  GetPermission(id: String!): Permission!
+  PaginateGroup(page: Int!, perPage: Int!, where: PaginatorWhere, orderBy: PaginatorOrderBy): [Group!]!
+  GetGroup(id: String!): Group!
   task(id: Int!): Task!
   project(id: Int!): Project!
   notification(id: Int!): Notification!
@@ -189,8 +194,8 @@ enum PaginatorOrderByOrder {
 
 type Mutation {
   createUser(input: CreateUserInput!): User!
-  updateUser(id: String!, input: UpdateUserInput!): User!
-  removeUser(id: String!): User!
+  UpdateUser(id: String!, input: UpdateUserInput!): User!
+  DeleteUser(id: String!): User!
   createChat(createChatInput: CreateChatInput!): Chat!
   updateChat(updateChatInput: UpdateChatInput!): Chat!
   removeChat(id: Int!): Chat!
@@ -200,9 +205,9 @@ type Mutation {
   CreatePermission(input: CreatePermissionInput!): Permission!
   UpdatePermission(id: String!, input: UpdatePermissionInput!): Permission!
   DeletePermission(id: String!): DeleteResult!
-  createGroup(createGroupInput: CreateGroupInput!): Group!
-  updateGroup(updateGroupInput: UpdateGroupInput!): Group!
-  removeGroup(id: Int!): Group!
+  CreateGroup(input: CreateGroupInput!): Group!
+  UpdateGroup(id: String!, input: UpdateGroupInput!): Group!
+  DeleteGroup(id: String!): Group!
   SignUp(input: SignUpInput!): SignUpResponse!
   SignIn(input: SignInInput!): SignInResponse!
   createTask(createTaskInput: CreateTaskInput!): Task!
@@ -259,7 +264,8 @@ input CreatePermissionInput {
   model_id: String!
   owner_type: OwnerType!
   model_type: ModelType!
-  user: RelationInput!
+  model_name: String
+  user: RelationInput
   level: Int!
   config: PermissionConfigInput
 }
@@ -283,20 +289,22 @@ input UpdatePermissionInput {
   model_id: String
   owner_type: OwnerType
   model_type: ModelType
+  model_name: String
   user: RelationInput
   level: Int!
   config: PermissionConfigInput
 }
 
 input CreateGroupInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  name: String!
+  label: String!
+  users: [RelationInput!]
 }
 
 input UpdateGroupInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  name: String!
+  label: String!
+  users: [RelationInput!]
 }
 
 input SignUpInput {

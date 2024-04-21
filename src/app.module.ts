@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
@@ -16,6 +16,7 @@ import { FileModule } from './file/file.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AppAuthGuard } from './auth/guards/auth.guard';
 import { PermissionGuard } from './permission/guards/permission.guard';
+import { NestModule } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PermissionGuard } from './permission/guards/permission.guard';
       driver: ApolloDriver,
       playground: true,
       autoSchemaFile: 'src/schema.gql',
+      context: ({ req }) => ({ req }),
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -58,4 +60,6 @@ import { PermissionGuard } from './permission/guards/permission.guard';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {}
+}
