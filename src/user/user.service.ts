@@ -37,7 +37,7 @@ export class UserService {
   ) {
     return getAllWithPagination<User>(
       info,
-      'permissions',
+      'users',
       this.repository,
       page,
       perPage,

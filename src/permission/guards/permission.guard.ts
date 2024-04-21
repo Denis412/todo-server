@@ -16,10 +16,10 @@ export class PermissionGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext().req;
-    const authorizationHeader = request.headers.authorization.split(' ')[1];
+    // const authorizationHeader = request.headers.authorization?.split(' ')[1];
 
-    const res = this.jwtService.decode(authorizationHeader);
-    const userId = res.sub;
+    // const res = this.jwtService.decode(authorizationHeader);
+    // const userId = res.sub;
 
     // console.log('req', request, authorizationHeader, res, userId);
 
