@@ -81,6 +81,24 @@ export class PermissionGuard implements CanActivate {
       if (!permissions.some((permission) => permission.level >= 4)) {
         throw new ForbiddenError('Нет доступа');
       }
+
+      const objectsPermissions =
+        await this.permissionService.checkPermissionInPermissionGuard({
+          and: [
+            {
+              column: 'model_name',
+              operator: PaginatorWhereOperator.EQ,
+              value: entity,
+            },
+            {
+              column: 'model_type',
+              operator: PaginatorWhereOperator.EQ,
+              value: 'object',
+            },
+          ],
+        });
+
+      request['object-permissions'] = objectsPermissions.data;
     }
     // else if (operation === 'get') {
     //   if (!permissions.some((permission) => permission.level >= 4)) {

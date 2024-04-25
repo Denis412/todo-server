@@ -14,6 +14,7 @@ import {
   WhereExpressionBuilder,
 } from 'typeorm';
 import { PaginatorInfo } from '../types/dto/pagination-result.type';
+import { Permission } from '../../permission/entities/permission.entity';
 
 const relationsForQuery = new Map();
 
@@ -162,8 +163,10 @@ export default async function getAllWithPagination<T = any>(
   perPage: number,
   where?: PaginatorWhere,
   orderBy?: PaginatorOrderBy,
+  objectPermissions?: Permission[],
 ) {
   const query = repository.createQueryBuilder(entityName);
+  let _where = where ?? {};
 
   if (info) {
     const fieldNodes =
@@ -171,11 +174,33 @@ export default async function getAllWithPagination<T = any>(
     addRelationWithInfo<T>(fieldNodes, query, repository.metadata, entityName);
   }
 
+  if (objectPermissions?.length) {
+    _where = {
+      and: [
+        {
+          or: objectPermissions
+            .filter((permission) => permission.level >= 4)
+            .map(
+              (permission): PaginatorWhere => ({
+                column: 'id',
+                operator: PaginatorWhereOperator.EQ,
+                value: permission.model_id,
+              }),
+            ),
+        },
+      ],
+    };
+
+    if (where) {
+      _where.and.push(where);
+    }
+  }
+
   applyWhereFilter(
     entityName,
     query,
     query,
-    where,
+    _where,
     repository.metadata,
     'orWhere',
   );
@@ -195,7 +220,7 @@ export default async function getAllWithPagination<T = any>(
 
   query.skip(offset).take(perPage);
 
-  console.log('f', query.getQuery());
+  // console.log('f', query.getQuery());
 
   // relationsForQuery.forEach((value, key) => {
   //   query.leftJoinAndSelect(key, value);

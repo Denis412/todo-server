@@ -8,6 +8,7 @@ import { generateId } from '../shared';
 import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
 import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
 import getAllWithPagination from '../shared/utils/getAllWithPagination';
+import { Permission } from '../permission/entities/permission.entity';
 
 @Injectable()
 export class UserService {
@@ -34,6 +35,7 @@ export class UserService {
     perPage: number,
     where?: PaginatorWhere,
     orderBy?: PaginatorOrderBy,
+    objectPermissions?: Permission[],
   ) {
     return getAllWithPagination<User>(
       info,
@@ -43,6 +45,7 @@ export class UserService {
       perPage,
       where,
       orderBy,
+      objectPermissions,
     );
   }
 
