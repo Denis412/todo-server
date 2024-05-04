@@ -178,15 +178,16 @@ export default async function getAllWithPagination<T = any>(
     _where = {
       and: [
         {
-          or: objectPermissions
-            .filter((permission) => permission.level >= 4)
-            .map(
-              (permission): PaginatorWhere => ({
-                column: 'id',
-                operator: PaginatorWhereOperator.EQ,
-                value: permission.model_id,
-              }),
-            ),
+          or: objectPermissions.map(
+            (permission): PaginatorWhere => ({
+              column: 'id',
+              operator:
+                permission.level >= 4
+                  ? PaginatorWhereOperator.EQ
+                  : PaginatorWhereOperator.NEQ,
+              value: permission.model_id,
+            }),
+          ),
         },
       ],
     };

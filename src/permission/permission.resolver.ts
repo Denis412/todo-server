@@ -11,7 +11,6 @@ import { PermissionService } from './permission.service';
 import { Permission } from './entities/permission.entity';
 import { CreatePermissionInput } from './dto/create-permission.input';
 import { UpdatePermissionInput } from './dto/update-permission.input';
-import { Public } from '../auth/decorators/public.decorator';
 import { DeleteResult } from '../shared';
 import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
 import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
@@ -26,6 +25,7 @@ export class PermissionResolver {
     @Context() context,
     @Args('input') input: CreatePermissionInput,
   ) {
+    console.log('cont', context.req['user']);
     return this.permissionService.create(input, context.req['user']);
   }
 

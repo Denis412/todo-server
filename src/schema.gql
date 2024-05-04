@@ -59,11 +59,11 @@ type Permission {
   owner_id: String!
   owner_type: OwnerType!
   model_type: ModelType!
-  model_name: String!
+  model_name: String
   level: Int!
   config: PermissionConfig
-  user: User!
-  group: Group!
+  user: User
+  group: Group
   author_id: String!
   created_at: DateTime!
   updated_at: DateTime!
@@ -266,6 +266,7 @@ input CreatePermissionInput {
   model_type: ModelType!
   model_name: String
   user: RelationInput
+  group: RelationInput
   level: Int!
   config: PermissionConfigInput
 }
@@ -291,6 +292,7 @@ input UpdatePermissionInput {
   model_type: ModelType
   model_name: String
   user: RelationInput
+  group: RelationInput
   level: Int!
   config: PermissionConfigInput
 }

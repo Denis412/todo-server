@@ -4,7 +4,7 @@ import { UpdatePermissionInput } from './dto/update-permission.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Permission } from './entities/permission.entity';
 import { EntityMetadata, Repository, SelectQueryBuilder } from 'typeorm';
-import { generateId } from '../shared';
+import { generateId, RelationInput } from '../shared';
 import { GroupService } from '../group/group.service';
 import { UserService } from '../user/user.service';
 import { OwnerType } from './types/owner-type.enum';
@@ -30,6 +30,21 @@ export class PermissionService {
         : await this.userService.getUserById(input.owner_id);
 
     console.log(targetOwner);
+
+    // const input = {
+    //   id: generateId(),
+    //   ...input,
+    //   author_id: userInfo.sub,
+    // };
+    //
+    // if (targetOwner instanceof User)
+    //   input.user = {
+    //     id: (await this.userService.getUserById(input.owner_id)).id,
+    //   };
+    // else
+    //   input.group = {
+    //     id: (await this.groupService.getGroupById(input.owner_id)).id,
+    //   };
 
     return this.repository.save({
       id: generateId(),

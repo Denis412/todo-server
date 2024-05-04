@@ -1,5 +1,9 @@
 import { Reflector } from '@nestjs/core';
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
@@ -27,7 +31,13 @@ export class AppAuthGuard extends AuthGuard('jwt') {
     const gqlContext = GqlExecutionContext.create(context);
     const request = gqlContext.getContext().req;
 
-    const token = request.headers.authorization.replace('Bearer', '').trim();
+    const authorizationHeader = request.headers.authorization;
+
+    if (!authorizationHeader) {
+      throw new ForbiddenException();
+    }
+
+    const token = authorizationHeader.replace('Bearer', '').trim();
     const userInfo = this.jwtService.decode(token);
 
     request['user'] = userInfo;

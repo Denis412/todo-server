@@ -29,6 +29,9 @@ export class CreatePermissionInput {
   @Field(() => RelationInput, { nullable: true })
   user: RelationInput;
 
+  @Field(() => RelationInput, { nullable: true })
+  group: RelationInput;
+
   @Field(() => Int)
   level: number;
 

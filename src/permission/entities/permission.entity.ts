@@ -37,7 +37,7 @@ export class Permission {
   @Column({ type: 'enum', enum: ModelType })
   model_type: ModelType;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ nullable: true })
   model_name: string;
 
@@ -49,12 +49,12 @@ export class Permission {
   @Column({ type: 'json', nullable: true })
   config: PermissionConfig;
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.permissions, { nullable: true })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Field(() => Group)
+  @Field(() => Group, { nullable: true })
   @ManyToOne(() => Group, (group) => group.permissions)
   @JoinColumn({ name: 'group_id' })
   group: Group;
