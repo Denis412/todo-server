@@ -35,25 +35,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    try {
-      const usersGroup = await this.groupService.getGroupByName('users');
-
-      await this.groupService.update(usersGroup.id, {
-        users: [...usersGroup.users, createdUser].map((u) => ({ id: u.id })),
-      } as UpdateGroupInput);
-    } catch (e) {
-      console.log('e', e);
-      await this.groupService.create(
-        {
-          name: 'users',
-          label: 'Пользователи',
-          users: [{ id: createdUser.id }],
-        } as CreateGroupInput,
-        {
-          sub: createdUser.id,
-        },
-      );
-    }
+    await this.groupService.createBaseUsersGroup(createdUser);
 
     return {
       id: createdUser.id,
