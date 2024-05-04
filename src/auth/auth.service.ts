@@ -7,10 +7,14 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as argon from 'argon2';
 import jwtConstants from './constants/jwtConstants';
+import { GroupService } from '../group/group.service';
+import { CreateGroupInput } from '../group/dto/create-group.input';
+import { UpdateGroupInput } from '../group/dto/update-group.input';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly groupService: GroupService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
@@ -30,6 +34,26 @@ export class AuthService {
       username: input.username,
       password: hashedPassword,
     });
+
+    try {
+      const usersGroup = await this.groupService.getGroupByName('users');
+
+      await this.groupService.update(usersGroup.id, {
+        users: [...usersGroup.users, createdUser].map((u) => ({ id: u.id })),
+      } as UpdateGroupInput);
+    } catch (e) {
+      console.log('e', e);
+      await this.groupService.create(
+        {
+          name: 'users',
+          label: 'Пользователи',
+          users: [{ id: createdUser.id }],
+        } as CreateGroupInput,
+        {
+          sub: createdUser.id,
+        },
+      );
+    }
 
     return {
       id: createdUser.id,

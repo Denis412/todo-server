@@ -4,7 +4,7 @@ import { UpdateGroupInput } from './dto/update-group.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
 import { Repository } from 'typeorm';
-import { generateId } from '../shared';
+import { generateId, PaginatorWhereOperator } from '../shared';
 import { PaginatorWhere } from '../shared/types/dto/paginator-where.type';
 import { PaginatorOrderBy } from '../shared/types/dto/paginator-order-by.type';
 import getAllWithPagination from '../shared/utils/getAllWithPagination';
@@ -46,6 +46,23 @@ export class GroupService {
 
     if (!targetGroup) {
       throw new NotFoundException(`Not found group with id ${id}`);
+    }
+
+    return targetGroup;
+  }
+
+  async getGroupByName(name: string) {
+    const targetGroup = await this.repository.findOne({
+      where: {
+        name,
+      },
+      relations: {
+        users: true,
+      },
+    });
+
+    if (!targetGroup) {
+      throw new NotFoundException(`Not found group with name ${name}`);
     }
 
     return targetGroup;
